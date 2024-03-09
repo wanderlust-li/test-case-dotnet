@@ -13,4 +13,7 @@ public class Transaction
     public DateTime TransactionDate { get; set; }
     
     public Tuple<double, double> ClientLocation { get; set; }
+    
+    // TimeZone represents the time zone obtained from ClientLocation coordinates
+    public string TimeZone { get; set; } 
 }
