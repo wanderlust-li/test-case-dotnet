@@ -14,79 +14,80 @@ namespace TestCase.Application.Service;
 public class TransactionService : ITransactionService
 {
     private readonly string _connectionString;
-    
+
     public TransactionService(IConfiguration configuration)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-    
-  public async Task<IEnumerable<Transaction>> ProcessTransactionsFromCSVAsync(Stream csvStream)
-{
-    var transactions = new List<Transaction>();
-    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+
+    public async Task<IEnumerable<Transaction>> ProcessTransactionsFromCSVAsync(Stream csvStream)
     {
-        PrepareHeaderForMatch = args => args.Header.ToLower(),
-    };
-
-    using (var streamReader = new StreamReader(csvStream))
-    using (var csvReader = new CsvReader(streamReader, config))
-    {
-        csvReader.Read();
-        csvReader.ReadHeader();
-        string[] requiredHeaders = { "transaction_id", "name", "email", "amount", "transaction_date", "client_location" };
-        foreach (var header in requiredHeaders)
+        var transactions = new List<Transaction>();
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            if (!csvReader.HeaderRecord.Any(h => string.Equals(h, header, StringComparison.OrdinalIgnoreCase)))
-            {
-                throw new BadRequestException($"The required header '{header}' is missing.");
-            }
-        }
+            PrepareHeaderForMatch = args => args.Header.ToLower(),
+        };
 
-        csvReader.Context.RegisterClassMap<TransactionMap>();
-
-        while (await csvReader.ReadAsync())
+        using (var streamReader = new StreamReader(csvStream))
+        using (var csvReader = new CsvReader(streamReader, config))
         {
-            var transaction = csvReader.GetRecord<Transaction>();
-
-            var timeZoneId = TimeZoneLookup.GetTimeZone(transaction.ClientLocation.Latitude, transaction.ClientLocation.Longitude).Result;
-            transaction.TimeZone = timeZoneId;
-
-            using (var db = new SqlConnection(_connectionString))
+            csvReader.Read();
+            csvReader.ReadHeader();
+            string[] requiredHeaders =
+                { "transaction_id", "name", "email", "amount", "transaction_date", "client_location" };
+            foreach (var header in requiredHeaders)
             {
-                var existingTransaction = await db.QuerySingleOrDefaultAsync<Transaction>(
-                    "SELECT * FROM Transactions WHERE TransactionId = @TransactionId",
-                    new { transaction.TransactionId });
-
-                if (existingTransaction != null)
+                if (!csvReader.HeaderRecord.Any(h => string.Equals(h, header, StringComparison.OrdinalIgnoreCase)))
                 {
-                    await db.ExecuteAsync(
-                        "UPDATE Transactions SET Name = @Name, Email = @Email, Amount = @Amount, TransactionDate = @TransactionDate, Latitude = @Latitude, Longitude = @Longitude, TimeZone = @TimeZone WHERE TransactionId = @TransactionId",
-                        new
-                        {
-                            transaction.Name, transaction.Email, transaction.Amount,
-                            transaction.TransactionDate, Latitude = transaction.ClientLocation.Latitude,
-                            Longitude = transaction.ClientLocation.Longitude, transaction.TimeZone,
-                            transaction.TransactionId
-                        });
-                }
-                else
-                {
-                    await db.ExecuteAsync(
-                        "INSERT INTO Transactions (TransactionId, Name, Email, Amount, TransactionDate, Latitude, Longitude, TimeZone) VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @Latitude, @Longitude, @TimeZone)",
-                        new
-                        {
-                            transaction.TransactionId, transaction.Name, transaction.Email, transaction.Amount,
-                            transaction.TransactionDate, Latitude = transaction.ClientLocation.Latitude,
-                            Longitude = transaction.ClientLocation.Longitude, transaction.TimeZone
-                        });
+                    throw new BadRequestException($"The required header '{header}' is missing.");
                 }
             }
 
-            transactions.Add(transaction);
+            csvReader.Context.RegisterClassMap<TransactionMap>();
+
+            while (await csvReader.ReadAsync())
+            {
+                var transaction = csvReader.GetRecord<Transaction>();
+
+                var timeZoneId = TimeZoneLookup
+                    .GetTimeZone(transaction.ClientLocation.Latitude, transaction.ClientLocation.Longitude).Result;
+                transaction.TimeZone = timeZoneId;
+
+                using (var db = new SqlConnection(_connectionString))
+                {
+                    var existingTransaction = await db.QuerySingleOrDefaultAsync<Transaction>(
+                        "SELECT * FROM Transactions WHERE TransactionId = @TransactionId",
+                        new { transaction.TransactionId });
+
+                    if (existingTransaction != null)
+                    {
+                        await db.ExecuteAsync(
+                            "UPDATE Transactions SET Name = @Name, Email = @Email, Amount = @Amount, TransactionDate = @TransactionDate, Latitude = @Latitude, Longitude = @Longitude, TimeZone = @TimeZone WHERE TransactionId = @TransactionId",
+                            new
+                            {
+                                transaction.Name, transaction.Email, transaction.Amount,
+                                transaction.TransactionDate, Latitude = transaction.ClientLocation.Latitude,
+                                Longitude = transaction.ClientLocation.Longitude, transaction.TimeZone,
+                                transaction.TransactionId
+                            });
+                    }
+                    else
+                    {
+                        await db.ExecuteAsync(
+                            "INSERT INTO Transactions (TransactionId, Name, Email, Amount, TransactionDate, Latitude, Longitude, TimeZone) VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @Latitude, @Longitude, @TimeZone)",
+                            new
+                            {
+                                transaction.TransactionId, transaction.Name, transaction.Email, transaction.Amount,
+                                transaction.TransactionDate, Latitude = transaction.ClientLocation.Latitude,
+                                Longitude = transaction.ClientLocation.Longitude, transaction.TimeZone
+                            });
+                    }
+                }
+
+                transactions.Add(transaction);
+            }
         }
+
+        return transactions;
     }
-
-    return transactions;
-}
-
 }

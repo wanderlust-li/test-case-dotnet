@@ -11,6 +11,7 @@ public static class ApplicationServiceRegistration
         IConfiguration configuration)
     {
         services.AddTransient<ITransactionService, TransactionService>();
+        services.AddScoped<IExportService, ExportService>();
         
         return services;
     }
