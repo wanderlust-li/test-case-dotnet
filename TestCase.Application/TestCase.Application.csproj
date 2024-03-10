@@ -7,11 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="31.0.2" />
+      <PackageReference Include="Dapper" Version="2.1.35" />
       <PackageReference Include="FluentValidation" Version="11.9.0" />
+      <PackageReference Include="GeoTimeZone" Version="5.3.0" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Service\" />
+      <ProjectReference Include="..\TestCase.Domain\TestCase.Domain.csproj" />
     </ItemGroup>
 
 </Project>

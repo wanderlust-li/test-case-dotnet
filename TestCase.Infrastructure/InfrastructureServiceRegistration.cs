@@ -13,6 +13,7 @@ public static class InfrastructureServiceRegistration
         services.AddDbContext<TestCaseContext>(options => {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
         });
+        services.AddSingleton<DapperContext>();
 
         return services;
     }

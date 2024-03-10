@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestCase.Infrastructure.DatabaseContext;
 
@@ -11,9 +12,11 @@ using TestCase.Infrastructure.DatabaseContext;
 namespace TestCase.Infrastructure.Migrations
 {
     [DbContext(typeof(TestCaseContext))]
-    partial class TestCaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240309203615_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,8 +27,9 @@ namespace TestCase.Infrastructure.Migrations
 
             modelBuilder.Entity("TestCase.Domain.Entities.Transaction", b =>
                 {
-                    b.Property<string>("TransactionId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Amount")
                         .HasColumnType("float");
@@ -39,6 +43,7 @@ namespace TestCase.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TimeZone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TransactionDate")
@@ -53,16 +58,16 @@ namespace TestCase.Infrastructure.Migrations
                 {
                     b.OwnsOne("TestCase.Domain.Entities.Location", "ClientLocation", b1 =>
                         {
-                            b1.Property<string>("TransactionId")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<Guid>("TransactionId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<double>("Latitude")
                                 .HasColumnType("float")
-                                .HasColumnName("Latitude");
+                                .HasColumnName("ClientLocationLatitude");
 
                             b1.Property<double>("Longitude")
                                 .HasColumnType("float")
-                                .HasColumnName("Longitude");
+                                .HasColumnName("ClientLocationLongitude");
 
                             b1.HasKey("TransactionId");
 

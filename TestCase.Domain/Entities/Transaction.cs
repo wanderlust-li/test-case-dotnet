@@ -2,7 +2,7 @@ namespace TestCase.Domain.Entities;
 
 public class Transaction
 {
-    public Guid TransactionId { get; set; } 
+    public string TransactionId { get; set; } 
     
     public string Name { get; set; }
     
@@ -12,8 +12,8 @@ public class Transaction
     
     public DateTime TransactionDate { get; set; }
     
-    public Tuple<double, double> ClientLocation { get; set; }
+    public Location ClientLocation { get; set; }
     
     // TimeZone represents the time zone obtained from ClientLocation coordinates
-    public string TimeZone { get; set; } 
+    public string? TimeZone { get; set; } 
 }
