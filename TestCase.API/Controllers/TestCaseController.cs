@@ -1,10 +1,10 @@
-using System.Data;
+using System.Collections;
 using Dapper;
+using GeoTimeZone;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using TestCase.Application.DTO;
-using TestCase.Application.Exceptions;
-using TestCase.Application.Helpers;
 using TestCase.Application.IService;
 
 namespace TestCase.API.Controllers;
@@ -13,26 +13,37 @@ namespace TestCase.API.Controllers;
 [Route("[controller]")]
 public class TestCaseController : ControllerBase
 {
+    private readonly ITransactionImportService _transactionImportService;
+    private readonly ITransactionExportService _transactionExportService;
     private readonly ITransactionService _transactionService;
-    private readonly IExportService _exportService;
 
-    public TestCaseController(ITransactionService transactionService, IExportService exportService)
+    public TestCaseController(ITransactionImportService transactionImportService, ITransactionExportService transactionExportService,
+        ITransactionService transactionService)
     {
+        _transactionImportService = transactionImportService;
+        _transactionExportService = transactionExportService;
         _transactionService = transactionService;
-        _exportService = exportService;
     }
 
-    [HttpPost("read-transactions-csv")]
-    public async Task<IActionResult> PostTransactionsFromCSV([FromForm] IFormFileCollection file)
+    [HttpPost("import-transactions-csv")]
+    public async Task<IActionResult> ImportTransactionsFromCSV([FromForm] IFormFileCollection file)
     {
-        return Ok(await _transactionService.ProcessTransactionsFromCSVAsync(file[0].OpenReadStream()));
+        return Ok(await _transactionImportService.ProcessTransactionsFromCSVAsync(file[0].OpenReadStream()));
     }
-    
-    [HttpGet("export-excel-file-transactions")]
-    public async Task<ActionResult> Download(CancellationToken ct)
+
+    [HttpGet("export-transactions-excel")]
+    public async Task<ActionResult> ExportTransactionsToExcel(CancellationToken ct)
     {
-        var file = await _exportService.ExportTransactionsToExcelAsync(ct);
+        var file = await _transactionExportService.ExportTransactionsToExcelAsync(ct);
         return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
     
+    
+    [HttpGet("transactions/2023-user")] // task 4
+    public async Task<ActionResult> GetTransactionsFor2023InUserTimeZone()
+    { 
+        return Ok(await _transactionService.GetTransactionsFor2023InUserTimeZone());
+    }
+    
+
 }

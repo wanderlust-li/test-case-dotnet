@@ -9,11 +9,11 @@ using TestCase.Application.IService;
 
 namespace TestCase.Application.Service;
 
-public class ExportService : IExportService
+public class TransactionExportService : ITransactionExportService
 {
     private readonly string _connectionString;
 
-    public ExportService(IConfiguration configuration)
+    public TransactionExportService(IConfiguration configuration)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }

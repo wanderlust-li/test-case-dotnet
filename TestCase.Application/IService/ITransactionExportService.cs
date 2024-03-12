@@ -1,6 +1,6 @@
 namespace TestCase.Application.IService;
 
-public interface IExportService
+public interface ITransactionExportService
 {
     Task<byte[]> ExportTransactionsToExcelAsync(CancellationToken ct);
 }

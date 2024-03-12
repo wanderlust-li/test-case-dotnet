@@ -1,8 +1,8 @@
-using TestCase.Domain.Entities;
+using TestCase.Application.DTO;
 
 namespace TestCase.Application.IService;
 
 public interface ITransactionService
 {
-    Task<IEnumerable<Transaction>> ProcessTransactionsFromCSVAsync(Stream csvStream);
+    Task<IEnumerable<TransactionDTO>> GetTransactionsFor2023InUserTimeZone();
 }

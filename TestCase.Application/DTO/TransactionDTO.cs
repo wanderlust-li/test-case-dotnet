@@ -1,7 +1,4 @@
 
-
-using TestCase.Domain.Entities;
-
 namespace TestCase.Application.DTO;
 
 public class TransactionDTO

@@ -10,8 +10,9 @@ public static class ApplicationServiceRegistration
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddTransient<ITransactionService, TransactionService>();
-        services.AddScoped<IExportService, ExportService>();
+        services.AddTransient<ITransactionImportService, TransactionImportService>();
+        services.AddScoped<ITransactionExportService, TransactionExportService>();
+        services.AddScoped<ITransactionService, TransactionService>();
         
         return services;
     }
