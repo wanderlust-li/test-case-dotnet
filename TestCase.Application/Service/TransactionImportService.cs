@@ -5,6 +5,7 @@ using Dapper;
 using GeoTimeZone;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using NodaTime;
 using TestCase.Application.Exceptions;
 using TestCase.Application.IService;
 using TestCase.Domain.Entities;
@@ -52,6 +53,8 @@ public class TransactionImportService : ITransactionImportService
 
                 var timeZoneId = TimeZoneLookup
                     .GetTimeZone(transaction.ClientLocation.Latitude, transaction.ClientLocation.Longitude).Result;
+                // var dateTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZoneId);
+                
                 transaction.TimeZone = timeZoneId;
 
                 using (var db = new SqlConnection(_connectionString))

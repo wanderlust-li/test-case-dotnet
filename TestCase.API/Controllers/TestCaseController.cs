@@ -1,10 +1,4 @@
-using System.Collections;
-using Dapper;
-using GeoTimeZone;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Newtonsoft.Json;
-using TestCase.Application.DTO;
 using TestCase.Application.IService;
 
 namespace TestCase.API.Controllers;
@@ -39,7 +33,7 @@ public class TestCaseController : ControllerBase
     }
     
     
-    [HttpGet("transactions/2023-user")] // task 4
+    [HttpGet("transactions/2023-user-time-zone")] // task 4
     public async Task<ActionResult> GetTransactionsFor2023InUserTimeZone()
     { 
         return Ok(await _transactionService.GetTransactionsFor2023InUserTimeZone());

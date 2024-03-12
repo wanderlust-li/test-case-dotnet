@@ -1,8 +1,11 @@
 using Dapper;
+using GeoTimeZone;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using NodaTime;
 using TestCase.Application.DTO;
 using TestCase.Application.IService;
+using TimeZoneMapper;
 
 namespace TestCase.Application.Service;
 
@@ -15,19 +18,33 @@ public class TransactionService : ITransactionService
     }
     public async Task<IEnumerable<TransactionDTO>> GetTransactionsFor2023InUserTimeZone()
     {
-        var myTimeZone = TimeZoneInfo.Local;
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(myTimeZone.Id);
-        Console.WriteLine(timeZone.Id);
-    
+        var localDateTimeZone = DateTimeZoneProviders.Tzdb.GetSystemDefault();
+        var instant = SystemClock.Instance.GetCurrentInstant();
+        var localOffset = localDateTimeZone.GetUtcOffset(instant);
+
+        List<TransactionDTO> filteredTransactions = new List<TransactionDTO>();
+
         using (var connection = new SqlConnection(_connectionString))
         {
             var transactions = await connection.QueryAsync<TransactionDTO>(
                 @"SELECT * FROM Transactions 
-              WHERE YEAR(TransactionDate) = 2023 AND TimeZone = @ServerTimeZone",
-                new { ServerTimeZone = timeZone.Id });
+              WHERE YEAR(TransactionDate) = 2023");
 
-            return transactions; 
+            foreach (var transaction in transactions)
+            {
+                var transactionTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(transaction.TimeZone);
+                if (transactionTimeZone != null)
+                {
+                    var transactionOffset = transactionTimeZone.GetUtcOffset(instant);
+
+                    if (transactionOffset == localOffset)
+                    {
+                        filteredTransactions.Add(transaction);
+                    }
+                }
+            }
         }
-    }
 
+        return filteredTransactions;
+    }
 }
