@@ -96,3 +96,6 @@ Retrieves transactions for January 2024 without time zone adjustments.
 - Do not use the UnitOfWork or Repository pattern.
 - Database queries must be written in SQL using Dapper.
 
+## Acknowledgements
+
+This project was developed based on the test case provided by [emleonid](https://github.com/emleonid/test-case-dotnet).
