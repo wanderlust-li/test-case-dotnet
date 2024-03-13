@@ -27,30 +27,34 @@ public class TestCaseController : ControllerBase
     }
 
     [HttpGet("export-transactions-excel")]
-    public async Task<ActionResult> ExportTransactionsToExcel(CancellationToken ct)
+    public async Task<IActionResult> ExportTransactionsToExcel(CancellationToken ct)
     {
         var file = await _transactionExportService.ExportTransactionsToExcelAsync(ct);
         return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
 
 
-    [HttpGet("transactions/2023-user-time-zone")] // task 4
-    public async Task<ActionResult> GetTransactionsFor2023InUserTimeZone()
+    [HttpGet("transactions/2023-user-time-zone")] 
+    public async Task<IActionResult> GetTransactionsFor2023InUserTimeZone()
     {
         return Ok(await _transactionService.GetTransactionsFor2023InUserTimeZone());
     }
 
-    [HttpGet("transactions/2023")] // task 5
-    public async Task<ActionResult> GetTransactionsFor2023()
+    [HttpGet("transactions/2023")] 
+    public async Task<IActionResult> GetTransactionsFor2023()
     {
         return Ok(await _transactionService.GetTransactionsFor2023());
     }
 
-    [HttpGet("transactions/2024-january-user-time-zone")] // task 6
-    public async Task<ActionResult> GetTransactionsForJanuary2024InUserTimeZone()
+    [HttpGet("transactions/2024-january-user-time-zone")] 
+    public async Task<IActionResult> GetTransactionsForJanuary2024InUserTimeZone()
     {
         return Ok(await _transactionService.GetTransactionsForJanuary2024InUserTimeZone());
     }
     
-    
+    [HttpGet("transactions/2024-january")] 
+    public async Task<IActionResult> GetTransactionsForJanuary2024()
+    {
+        return Ok(await _transactionService.GetTransactionsForJanuary2024());
+    }
 }

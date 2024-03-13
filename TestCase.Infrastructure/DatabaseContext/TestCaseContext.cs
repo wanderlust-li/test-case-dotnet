@@ -14,7 +14,7 @@ public class TestCaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.OwnsOne(transaction => transaction.ClientLocation, location =>

@@ -12,7 +12,7 @@ public class ExceptionMiddleware
     {
         _next = next;
     }
-    
+
     public async Task InvokeAsync(HttpContext httpContext)
     {
         try

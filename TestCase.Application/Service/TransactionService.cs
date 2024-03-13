@@ -93,4 +93,18 @@ public class TransactionService : ITransactionService
             return filteredTransactions;
         }
     }
+
+    public async Task<IEnumerable<TransactionDTO>> GetTransactionsForJanuary2024()
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var transactions = await connection.QueryAsync<TransactionDTO>(
+                @"SELECT * FROM Transactions 
+              WHERE TransactionDate >= '2024-01-01' 
+              AND TransactionDate < '2024-02-01'");
+
+            return transactions.ToList();
+        }
+    }
+
 }

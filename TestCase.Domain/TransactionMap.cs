@@ -19,18 +19,23 @@ public sealed class TransactionMap : ClassMap<Transaction>
             {
                 return amount;
             }
-            return 0; 
+
+            return 0;
         });
         Map(m => m.TransactionDate).Name("transaction_date").TypeConverterOption.Format("yyyy-MM-dd HH:mm:ss");
         Map(m => m.ClientLocation.Latitude).Convert(args =>
         {
             var location = args.Row.GetField("client_location").Split(',');
-            return double.TryParse(location[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double latitude) ? latitude : 0;
+            return double.TryParse(location[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double latitude)
+                ? latitude
+                : 0;
         });
         Map(m => m.ClientLocation.Longitude).Convert(args =>
         {
             var location = args.Row.GetField("client_location").Split(',');
-            return double.TryParse(location[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double longitude) ? longitude : 0;
+            return double.TryParse(location[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double longitude)
+                ? longitude
+                : 0;
         });
     }
 }

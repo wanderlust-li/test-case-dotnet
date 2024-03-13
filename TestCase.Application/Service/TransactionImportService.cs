@@ -54,7 +54,7 @@ public class TransactionImportService : ITransactionImportService
                 var timeZoneId = TimeZoneLookup
                     .GetTimeZone(transaction.ClientLocation.Latitude, transaction.ClientLocation.Longitude).Result;
                 // var dateTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZoneId);
-                
+
                 transaction.TimeZone = timeZoneId;
 
                 using (var db = new SqlConnection(_connectionString))
